@@ -22,6 +22,82 @@ export const ContainerItem = styled.div`
   }
 `
 
+export const ContainerFilter = styled.div`
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+`
+
+export const Result = styled.div`
+  width: 15%;
+  display: flex;
+  justify-content: baseline;
+  align-items: center;
+
+  & p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+  }
+
+  & span {
+    color: rgba(0, 0, 0, 0.5);
+  }
+`
+
+export const Filter = styled.button`
+  background-color: rgb(133, 133, 255);
+  color: white;
+  padding: 5px 20px;
+  text-align: center;
+  display: inline-block;
+  margin: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgb(112, 112, 255);
+  }
+`
+
+export const ShowOptions = styled.div`
+  width: 13%;
+  height: 150px;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  /* border: solid 1px black; */
+  position: absolute;
+  top: 100%;
+  right: 0px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 10;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  & p {
+    padding: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  & p:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+`
+
 export const Main = styled.main`
   width: 90%;
   height: auto;
@@ -29,7 +105,7 @@ export const Main = styled.main`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   /* grid-template-columns: repeat(3, 1fr); */
   gap: 30px;
-  margin-top: 3%;
+  /* margin-top: 3%; */
 `
 
 export const SneakerItem = styled.div`
@@ -37,18 +113,13 @@ export const SneakerItem = styled.div`
   height: 500px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  cursor: pointer;
 
   &:hover {
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   }
 
-  &:hover a::before {
+  /* &:hover a::before {
     content: 'Visitar';
     position: absolute;
     top: 60%;
@@ -62,7 +133,17 @@ export const SneakerItem = styled.div`
     font-family: 'Roboto', sans-serif;
     font-size: 1rem;
     z-index: 1;
-  }
+  } */
+`
+
+export const Details = styled.a`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
 `
 
 export const ImageCard = styled.div`
@@ -71,6 +152,7 @@ export const ImageCard = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 
   & img {
     width: 100%;
@@ -88,6 +170,7 @@ export const Discount = styled.div`
   position: absolute;
   top: 5%;
   right: 5%;
+  z-index: 5;
 
   & p {
     font-family: 'Roboto', sans-serif;
