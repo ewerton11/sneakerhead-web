@@ -56,7 +56,7 @@ export function Feed() {
               setShowOptions(!showOptions)
             }}
           >
-            Ordenar
+            ordenar
           </styled.Filter>
           {showOptions && (
             <styled.ShowOptions>
