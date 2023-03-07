@@ -47,20 +47,21 @@ export const Result = styled.div`
 `
 
 export const Filter = styled.button`
-  background-color: rgb(133, 133, 255);
-  color: white;
-  padding: 5px 20px;
-  text-align: center;
+  background-color: white;
+  color: black;
+  padding: 5px 10px;
   display: inline-block;
   margin: 10px;
-  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
+  text-align: center;
   font-family: 'Roboto', sans-serif;
   font-size: 1rem;
+  cursor: pointer;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: rgb(112, 112, 255);
+    background-color: rgb(238, 241, 243);
   }
 `
 
@@ -94,7 +95,7 @@ export const ShowOptions = styled.div`
   }
 
   & p:hover {
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgb(238, 241, 243);
   }
 `
 
@@ -157,7 +158,7 @@ export const ImageCard = styled.div`
   & img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* object-fit: cover; */
   }
 `
 
