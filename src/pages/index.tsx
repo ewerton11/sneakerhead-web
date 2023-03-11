@@ -1,6 +1,5 @@
 import Head from 'next/head'
-import { Feed } from './feed'
-import Header from './header'
+import { Feed } from './home'
 
 export default function Home() {
   return (
@@ -18,7 +17,6 @@ export default function Home() {
           rel="stylesheet"
         />
       </Head>
-      <Header />
       <Feed />
     </>
   )

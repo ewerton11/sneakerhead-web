@@ -1,4 +1,4 @@
-import { HeaderStyled, Logo } from '@/styles/header/styled'
+import { HeaderStyled, Logo } from '@/components/header/styled'
 
 export default function Header() {
   return (
