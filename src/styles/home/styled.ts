@@ -77,39 +77,6 @@ export const FilterButtonIcon = styled.div`
   }
 `
 
-// export const ShowOptions = styled.div`
-//   width: 13%;
-//   height: 150px;
-//   background-color: white;
-//   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-//   border-radius: 10px;
-//   display: flex;
-//   flex-direction: column;
-//   position: absolute;
-//   top: 100%;
-//   right: 0px;
-//   overflow-x: hidden;
-//   overflow-y: auto;
-//   z-index: 10;
-
-//   ::-webkit-scrollbar {
-//     display: none;
-//   }
-
-//   & p {
-//     padding: 10px;
-//     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-//     font-family: 'Roboto', sans-serif;
-//     font-size: 1em;
-//     text-align: center;
-//     cursor: pointer;
-//   }
-
-//   & p:hover {
-//     background-color: rgb(238, 241, 243);
-//   }
-// `
-
 export const SearchBarContainer = styled.div`
   width: 10%;
   height: 100%;
@@ -142,12 +109,12 @@ export const ButtonIcon = styled.button`
   }
 `
 
-export const FiltersAndSneakers = styled.div`
+export const FiltersAndSneakers = styled.div<{ showOptions: boolean }>`
   display: grid;
-  grid-template-columns: 20vw 1fr;
+  grid-template-columns: ${({ showOptions }) =>
+    showOptions ? '20vw 1fr' : '1fr'};
   grid-template-rows: 1fr;
   gap: 10px;
-  margin: 0px;
 `
 
 export const DesktopFilters = styled.div`
@@ -155,11 +122,11 @@ export const DesktopFilters = styled.div`
   height: fit-content;
   max-height: 100%;
   background-color: white;
+  margin-top: 15px;
   position: sticky;
   top: 0px;
   display: flex;
   flex-direction: column;
-  border: solid 1px black;
 
   & p {
     padding: 10px;
@@ -172,6 +139,78 @@ export const DesktopFilters = styled.div`
   & p:hover {
     background-color: rgb(238, 241, 243);
   }
+`
+
+export const ListFilter = styled.div`
+  width: 100%;
+  height: fit-content;
+  max-height: 100%;
+`
+
+export const OrderButton = styled.button`
+  width: 100%;
+  padding: 1rem;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  font-size: 1rem;
+  cursor: pointer;
+`
+
+export const ButtonText = styled.div`
+  width: 80%;
+  display: flex;
+  align-items: center;
+
+  & h2 {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+`
+
+export const ArrowIcon = styled.div<{ orderButton: boolean }>`
+  width: 20%;
+
+  & img {
+    width: 30%;
+    height: 30%;
+    transform: ${({ orderButton }) =>
+      orderButton ? 'rotate(180deg)' : 'none'};
+    transition: transform 0.2s ease-in-out;
+  }
+`
+
+export const ListOptions = styled.div<{ orderButton: boolean }>`
+  padding-top: 10%;
+  display: ${({ orderButton }) => (orderButton ? 'block' : 'none')};
+`
+
+export const UlList = styled.ul`
+  height: fit-content;
+
+  & li {
+    padding: 0px 0px 1rem 1rem;
+    display: flex;
+    cursor: pointer;
+  }
+`
+
+export const Square = styled.div`
+  width: 17px;
+  height: 17px;
+  border: solid 2px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7em;
+  cursor: pointer;
+`
+
+export const TextLi = styled.div`
+  width: 85%;
+  margin-left: 5%;
+  letter-spacing: 1px;
 `
 
 export const SneakersContainer = styled.main`
@@ -233,24 +272,31 @@ export const Discount = styled.div`
 
 export const ContainerInfo = styled.div`
   width: 100%;
-  height: 14%;
+  height: 15%;
+  margin-top: 10px;
 `
 
 export const DivInfo = styled.div`
   width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  font-family: 'Roboto', sans-serif;
 `
 
 export const ContainerName = styled.div`
   width: 100%;
   height: 50%;
+  padding: 10px 0px 10px 0px;
+  display: flex;
+  align-items: center;
 `
 
 export const ContainerPrice = styled.div`
   width: 100%;
   height: 50%;
+  display: flex;
+  /* justify-content: space-between; */
+  align-items: center;
 
   & p {
     font-weight: bold;
@@ -259,6 +305,7 @@ export const ContainerPrice = styled.div`
   & p:nth-child(2) {
     color: rgba(0, 0, 0, 0.7);
     text-decoration: line-through;
+    padding-left: 10px;
   }
 `
 
