@@ -1,3 +1,4 @@
+import Footer from '@/components/footer'
 import Header from '@/components/header'
 import { api } from '@/lib/axios/axios'
 import * as styled from '@/styles/home/styled'
@@ -22,6 +23,10 @@ export function Feed() {
   const [searchValue, setSearchValue] = useState('')
   const [showOptions, setShowOptions] = useState(false)
   const [order, setOrder] = useState<string>()
+  const [showPrecoOptions, setShowPrecoOptions] = useState(false)
+  const [orderPrice, setOrderPrice] = useState(false)
+  const [orderBrand, setOrderBrand] = useState(false)
+  const [orderDiscount, setOrderDiscount] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -95,49 +100,132 @@ export function Feed() {
               </styled.SearchBarForm>
             </styled.SearchBarContainer>
           </styled.FilterWrapper>
-          <styled.FiltersAndSneakers>
+          <styled.FiltersAndSneakers showOptions={showOptions}>
             {showOptions && (
               <styled.DesktopFilters>
-                <p
-                  onClick={() => {
-                    setShowOptions(!showOptions)
-                    setOrder('DescPrice')
-                  }}
-                >
-                  Maior preço
-                </p>
-                <p
-                  onClick={() => {
-                    setShowOptions(!showOptions)
-                    setOrder('AscPrice')
-                  }}
-                >
-                  Menor preço
-                </p>
-                <p
-                  onClick={() => {
-                    setShowOptions(!showOptions)
-                    setOrder('DescDiscount')
-                  }}
-                >
-                  Maiores descontos
-                </p>
-                <p
-                  onClick={() => {
-                    setShowOptions(!showOptions)
-                    setOrder('BrandAdidas')
-                  }}
-                >
-                  Tênis da adidas
-                </p>
-                <p
-                  onClick={() => {
-                    setShowOptions(!showOptions)
-                    setOrder('BrandNike')
-                  }}
-                >
-                  Tênis da nike
-                </p>
+                <styled.ListFilter>
+                  <styled.OrderButton
+                    onClick={() => setOrderPrice(!orderPrice)}
+                  >
+                    <styled.ButtonText>
+                      <h2>Preços</h2>
+                    </styled.ButtonText>
+                    <styled.ArrowIcon orderButton={orderPrice}>
+                      <Image
+                        src="/images/arrow.svg"
+                        alt="arrow"
+                        width={10}
+                        height={10}
+                      />
+                    </styled.ArrowIcon>
+                  </styled.OrderButton>
+                  <styled.ListOptions orderButton={orderPrice}>
+                    <styled.UlList>
+                      <li
+                        role="checkbox"
+                        aria-checked={order === 'DescPrice'}
+                        onClick={() => {
+                          setOrder('DescPrice')
+                        }}
+                      >
+                        <styled.Square>
+                          {order === 'DescPrice' && '✔️'}
+                        </styled.Square>
+                        <styled.TextLi>Maior preço</styled.TextLi>
+                      </li>
+                      <li
+                        role="checkbox"
+                        aria-checked={order === 'AscPrice'}
+                        onClick={() => {
+                          setOrder('AscPrice')
+                        }}
+                      >
+                        <styled.Square>
+                          {order === 'AscPrice' && '✔️'}
+                        </styled.Square>
+                        <styled.TextLi>Menor preço</styled.TextLi>
+                      </li>
+                    </styled.UlList>
+                  </styled.ListOptions>
+                </styled.ListFilter>
+                <styled.ListFilter>
+                  <styled.OrderButton
+                    onClick={() => setOrderBrand(!orderBrand)}
+                  >
+                    <styled.ButtonText>
+                      <h2>Marca</h2>
+                    </styled.ButtonText>
+                    <styled.ArrowIcon orderButton={orderBrand}>
+                      <Image
+                        src="/images/arrow.svg"
+                        alt="arrow"
+                        width={10}
+                        height={10}
+                      />
+                    </styled.ArrowIcon>
+                  </styled.OrderButton>
+                  <styled.ListOptions orderButton={orderBrand}>
+                    <styled.UlList>
+                      <li
+                        role="checkbox"
+                        aria-checked={order === 'BrandAdidas'}
+                        onClick={() => {
+                          setOrder('BrandAdidas')
+                        }}
+                      >
+                        <styled.Square>
+                          {order === 'BrandAdidas' && '✔️'}
+                        </styled.Square>
+                        <styled.TextLi>Tênis da adidas</styled.TextLi>
+                      </li>
+                      <li
+                        role="checkbox"
+                        aria-checked={order === 'BrandNike'}
+                        onClick={() => {
+                          setOrder('BrandNike')
+                        }}
+                      >
+                        <styled.Square>
+                          {order === 'BrandNike' && '✔️'}
+                        </styled.Square>
+                        <styled.TextLi>Tênis da nike</styled.TextLi>
+                      </li>
+                    </styled.UlList>
+                  </styled.ListOptions>
+                </styled.ListFilter>
+                <styled.ListFilter>
+                  <styled.OrderButton
+                    onClick={() => setOrderDiscount(!orderDiscount)}
+                  >
+                    <styled.ButtonText>
+                      <h2>Descontos</h2>
+                    </styled.ButtonText>
+                    <styled.ArrowIcon orderButton={orderDiscount}>
+                      <Image
+                        src="/images/arrow.svg"
+                        alt="arrow"
+                        width={10}
+                        height={10}
+                      />
+                    </styled.ArrowIcon>
+                  </styled.OrderButton>
+                  <styled.ListOptions orderButton={orderDiscount}>
+                    <styled.UlList>
+                      <li
+                        role="checkbox"
+                        aria-checked={order === 'DescDiscount'}
+                        onClick={() => {
+                          setOrder('DescDiscount')
+                        }}
+                      >
+                        <styled.Square>
+                          {order === 'DescDiscount' && '✔️'}
+                        </styled.Square>
+                        <styled.TextLi>Maiores Descontos</styled.TextLi>
+                      </li>
+                    </styled.UlList>
+                  </styled.ListOptions>
+                </styled.ListFilter>
               </styled.DesktopFilters>
             )}
             <styled.SneakersContainer>
@@ -209,6 +297,7 @@ export function Feed() {
           </styled.ContainerLoad>
         </styled.ContainerWrapper>
       </styled.ContainerStyled>
+      <Footer />
     </styled.LayoutContainer>
   )
 }
