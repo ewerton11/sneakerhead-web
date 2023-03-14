@@ -25,7 +25,7 @@ export function Feed() {
   const [sortByBrand, setSortByBrand] = useState<string>('')
   const [sortByDiscounts, setSortByDiscounts] = useState<string>('')
   const [sortByPrice, setSortByPrice] = useState<string>('')
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(40)
   const [showOptions, setShowOptions] = useState(false)
   const [orderPrice, setOrderPrice] = useState(false)
   const [orderBrand, setOrderBrand] = useState(false)
@@ -51,7 +51,7 @@ export function Feed() {
     if (results.length < limit) {
       return
     }
-    setLimit((prevState) => prevState + 20)
+    setLimit((prevState) => prevState + 40)
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -106,7 +106,7 @@ export function Feed() {
                 />
               </styled.FilterButtonIcon>
             </styled.FilterButton>
-            <styled.ContainerSneakersColumns>
+            <styled.ContainerSneakersColumns columns={columns}>
               <styled.SneakersColumns onClick={() => setColumns('two')}>
                 <div></div>
                 <div></div>
@@ -225,7 +225,7 @@ export function Feed() {
                         <styled.Square>
                           {sortByBrand === 'adidas' && '✔️'}
                         </styled.Square>
-                        <styled.TextLi>Tênis da adidas</styled.TextLi>
+                        <styled.TextLi>Adidas</styled.TextLi>
                       </li>
                       <li
                         role="checkbox"
@@ -237,7 +237,7 @@ export function Feed() {
                         <styled.Square>
                           {sortByBrand === 'nike' && '✔️'}
                         </styled.Square>
-                        <styled.TextLi>Tênis da nike</styled.TextLi>
+                        <styled.TextLi>Nike</styled.TextLi>
                       </li>
                     </styled.UlList>
                   </styled.ListOptions>
