@@ -1,9 +1,11 @@
+import Image from 'next/image'
+import { FormEvent, useEffect, useState } from 'react'
+
 import Footer from '@/components/footer'
 import Header from '@/components/header'
+
 import { api } from '@/lib/axios/axios'
 import * as styled from '@/styles/home/styled'
-import Image from 'next/image'
-import { useEffect, useState } from 'react'
 
 interface Sneakers {
   id: number
@@ -19,28 +21,31 @@ interface Sneakers {
 export function Feed() {
   const [results, setResults] = useState<Sneakers[]>([])
   const [resultsAll, setResultsAll] = useState<Sneakers[]>([])
+  const [searchValue, setSearchValue] = useState<string>('')
+  const [sortByBrand, setSortByBrand] = useState<string>('')
+  const [sortByDiscounts, setSortByDiscounts] = useState<string>('')
+  const [sortByPrice, setSortByPrice] = useState<string>('')
   const [limit, setLimit] = useState(20)
-  const [searchValue, setSearchValue] = useState('')
   const [showOptions, setShowOptions] = useState(false)
-  const [order, setOrder] = useState<string>()
-  const [showPrecoOptions, setShowPrecoOptions] = useState(false)
   const [orderPrice, setOrderPrice] = useState(false)
   const [orderBrand, setOrderBrand] = useState(false)
   const [orderDiscount, setOrderDiscount] = useState(false)
+  const [columns, setColumns] = useState('three')
 
   useEffect(() => {
     async function fetchData() {
       const response = await api.get(
-        `/sneakers?sorting=${order}&limit=${limit}&search=${searchValue}`
+        `/sneakers?search=${searchValue}&sortByBrand=${sortByBrand}` +
+          `&sortByDiscounts=${sortByDiscounts}&sortByPrice=${sortByPrice}&limit=${limit}`
       )
       setResults(response.data)
 
-      const responseAll = await api.get(`sneakers?search=${searchValue}`)
+      const responseAll = await api.get(`sneakers?limit=10000`)
       setResultsAll(responseAll.data)
     }
 
     fetchData()
-  }, [limit, order, searchValue])
+  }, [searchValue, sortByBrand, sortByDiscounts, sortByPrice, limit])
 
   const getItems = () => {
     if (results.length < limit) {
@@ -49,9 +54,16 @@ export function Feed() {
     setLimit((prevState) => prevState + 20)
   }
 
-  const filteredResults = results.filter((item) =>
-    item.name.toLowerCase().includes(searchValue.toLowerCase())
-  )
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const { elements } = e.target as HTMLFormElement
+
+    if (elements) {
+      const inputSearch = elements.namedItem('inputSearch') as HTMLInputElement
+      const searchValue = inputSearch?.value || ''
+      setSearchValue(searchValue)
+    }
+  }
 
   return (
     <styled.LayoutContainer>
@@ -66,30 +78,14 @@ export function Feed() {
                 </p>
               </styled.ResultsCounter>
             </styled.ResultsCounterWrapper>
-            <styled.FilterButton
-              onClick={() => {
-                setShowOptions(!showOptions)
-              }}
-            >
-              <styled.FilterButtonText>Filtrar</styled.FilterButtonText>
-              <styled.FilterButtonIcon>
-                <Image
-                  src="/images/filter-icon.png"
-                  alt="Filtrar"
-                  width={20}
-                  height={20}
-                />
-              </styled.FilterButtonIcon>
-            </styled.FilterButton>
             <styled.SearchBarContainer>
-              <styled.SearchBarForm>
+              <styled.SearchBarForm onSubmit={handleSubmit}>
                 <styled.InputSearch
+                  name="inputSearch"
                   type="text"
                   placeholder="buscar"
-                  // value={searchValue}
-                  // onChange={(e) => setSearchValue(e.target.value)}
                 />
-                <styled.ButtonIcon>
+                <styled.ButtonIcon type="submit">
                   <Image
                     src="/images/lupa-icon.png"
                     alt="lupa"
@@ -99,6 +95,41 @@ export function Feed() {
                 </styled.ButtonIcon>
               </styled.SearchBarForm>
             </styled.SearchBarContainer>
+            <styled.FilterButton onClick={() => setShowOptions(!showOptions)}>
+              <styled.FilterButtonText>Filtrar</styled.FilterButtonText>
+              <styled.FilterButtonIcon>
+                <Image
+                  src="/images/filter-icon.png"
+                  alt="filtrar"
+                  width={20}
+                  height={20}
+                />
+              </styled.FilterButtonIcon>
+            </styled.FilterButton>
+            <styled.ContainerSneakersColumns>
+              <styled.SneakersColumns onClick={() => setColumns('two')}>
+                <div></div>
+                <div></div>
+              </styled.SneakersColumns>
+              <styled.SneakersColumns onClick={() => setColumns('three')}>
+                <div></div>
+                <div></div>
+                <div></div>
+              </styled.SneakersColumns>
+              <styled.SneakersColumns onClick={() => setColumns('four')}>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </styled.SneakersColumns>
+            </styled.ContainerSneakersColumns>
+            <styled.FilterProvided>
+              {sortByPrice === 'DescPrice' && <li>maiores preços</li>}
+              {sortByPrice === 'AscPrice' && <li>menores preços</li>}
+              {sortByBrand === 'adidas' && <li>marca adidas</li>}
+              {sortByBrand === 'nike' && <li>marca nike</li>}
+              {sortByDiscounts === 'DescDiscount' && <li>com disconto</li>}
+            </styled.FilterProvided>
           </styled.FilterWrapper>
           <styled.FiltersAndSneakers showOptions={showOptions}>
             {showOptions && (
@@ -120,28 +151,37 @@ export function Feed() {
                     </styled.ArrowIcon>
                   </styled.OrderButton>
                   <styled.ListOptions orderButton={orderPrice}>
+                    <styled.ClearSelection>
+                      <styled.ClearText
+                        onClick={() => {
+                          setSortByPrice('')
+                        }}
+                      >
+                        Limpar
+                      </styled.ClearText>
+                    </styled.ClearSelection>
                     <styled.UlList>
                       <li
                         role="checkbox"
-                        aria-checked={order === 'DescPrice'}
+                        aria-checked={sortByPrice === 'DescPrice'}
                         onClick={() => {
-                          setOrder('DescPrice')
+                          setSortByPrice('DescPrice')
                         }}
                       >
                         <styled.Square>
-                          {order === 'DescPrice' && '✔️'}
+                          {sortByPrice === 'DescPrice' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Maior preço</styled.TextLi>
                       </li>
                       <li
                         role="checkbox"
-                        aria-checked={order === 'AscPrice'}
+                        aria-checked={sortByPrice === 'AscPrice'}
                         onClick={() => {
-                          setOrder('AscPrice')
+                          setSortByPrice('AscPrice')
                         }}
                       >
                         <styled.Square>
-                          {order === 'AscPrice' && '✔️'}
+                          {sortByPrice === 'AscPrice' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Menor preço</styled.TextLi>
                       </li>
@@ -165,28 +205,37 @@ export function Feed() {
                     </styled.ArrowIcon>
                   </styled.OrderButton>
                   <styled.ListOptions orderButton={orderBrand}>
+                    <styled.ClearSelection>
+                      <styled.ClearText
+                        onClick={() => {
+                          setSortByBrand('')
+                        }}
+                      >
+                        Limpar
+                      </styled.ClearText>
+                    </styled.ClearSelection>
                     <styled.UlList>
                       <li
                         role="checkbox"
-                        aria-checked={order === 'BrandAdidas'}
+                        aria-checked={sortByBrand === 'adidas'}
                         onClick={() => {
-                          setOrder('BrandAdidas')
+                          setSortByBrand('adidas')
                         }}
                       >
                         <styled.Square>
-                          {order === 'BrandAdidas' && '✔️'}
+                          {sortByBrand === 'adidas' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Tênis da adidas</styled.TextLi>
                       </li>
                       <li
                         role="checkbox"
-                        aria-checked={order === 'BrandNike'}
+                        aria-checked={sortByBrand === 'nike'}
                         onClick={() => {
-                          setOrder('BrandNike')
+                          setSortByBrand('nike')
                         }}
                       >
                         <styled.Square>
-                          {order === 'BrandNike' && '✔️'}
+                          {sortByBrand === 'nike' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Tênis da nike</styled.TextLi>
                       </li>
@@ -210,86 +259,102 @@ export function Feed() {
                     </styled.ArrowIcon>
                   </styled.OrderButton>
                   <styled.ListOptions orderButton={orderDiscount}>
+                    <styled.ClearSelection>
+                      <styled.ClearText
+                        onClick={() => {
+                          setSortByDiscounts('')
+                        }}
+                      >
+                        Limpar
+                      </styled.ClearText>
+                    </styled.ClearSelection>
                     <styled.UlList>
                       <li
                         role="checkbox"
-                        aria-checked={order === 'DescDiscount'}
+                        aria-checked={sortByDiscounts === 'DescDiscount'}
                         onClick={() => {
-                          setOrder('DescDiscount')
+                          setSortByDiscounts('DescDiscount')
                         }}
                       >
                         <styled.Square>
-                          {order === 'DescDiscount' && '✔️'}
+                          {sortByDiscounts === 'DescDiscount' && '✔️'}
                         </styled.Square>
-                        <styled.TextLi>Maiores Descontos</styled.TextLi>
+                        <styled.TextLi>Com desconto</styled.TextLi>
                       </li>
                     </styled.UlList>
                   </styled.ListOptions>
                 </styled.ListFilter>
               </styled.DesktopFilters>
             )}
-            <styled.SneakersContainer>
-              {filteredResults.map((sneaker: Sneakers) => {
-                return (
-                  <styled.SneakersWrapper key={sneaker.id}>
-                    <styled.Details href={sneaker.details}>
-                      <styled.ImageCard>
-                        {sneaker.discount ? (
-                          <styled.Discount>
-                            <p>{sneaker.discount}%</p>
-                          </styled.Discount>
-                        ) : (
-                          ''
-                        )}
-                        {sneaker.store === 'adidas' ? (
-                          <Image
-                            src={sneaker.image}
-                            width={360}
-                            height={348}
-                            alt={''}
-                            style={{ transform: 'scaleX(-1)' }}
-                          />
-                        ) : (
-                          <Image
-                            src={sneaker.image}
-                            width={360}
-                            height={348}
-                            alt={''}
-                          />
-                        )}
-                      </styled.ImageCard>
-                      <styled.ContainerInfo>
-                        <styled.DivInfo>
-                          <styled.ContainerName>
-                            <p>{sneaker.name}</p>
-                          </styled.ContainerName>
-                          <styled.ContainerPrice>
-                            <p>
-                              {(sneaker.price / 100).toLocaleString('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                              })}
-                            </p>
-                            {sneaker.previous_price !== null ? (
+            <styled.SneakersContainer columns={columns}>
+              {results.map(
+                ({
+                  id,
+                  details,
+                  discount,
+                  store,
+                  image,
+                  name,
+                  price,
+                  previous_price,
+                }: Sneakers) => {
+                  return (
+                    <styled.SneakersWrapper key={id}>
+                      <styled.Details href={details}>
+                        <styled.ImageCard>
+                          {discount && (
+                            <styled.Discount>
+                              <p>{discount}%</p>
+                            </styled.Discount>
+                          )}
+                          {store === 'adidas' ? (
+                            <Image
+                              src={image}
+                              width={360}
+                              height={348}
+                              alt={''}
+                              style={{ transform: 'scaleX(-1)' }}
+                            />
+                          ) : (
+                            <Image
+                              src={image}
+                              width={360}
+                              height={348}
+                              alt={''}
+                            />
+                          )}
+                        </styled.ImageCard>
+                        <styled.ContainerInfo>
+                          <styled.DivInfo>
+                            <styled.ContainerName>
+                              <p>{name}</p>
+                            </styled.ContainerName>
+                            <styled.ContainerPrice>
                               <p>
-                                {(sneaker.previous_price / 100).toLocaleString(
-                                  'pt-BR',
-                                  {
-                                    style: 'currency',
-                                    currency: 'BRL',
-                                  }
-                                )}
+                                {(price / 100).toLocaleString('pt-BR', {
+                                  style: 'currency',
+                                  currency: 'BRL',
+                                })}
                               </p>
-                            ) : (
-                              ''
-                            )}
-                          </styled.ContainerPrice>
-                        </styled.DivInfo>
-                      </styled.ContainerInfo>
-                    </styled.Details>
-                  </styled.SneakersWrapper>
-                )
-              })}
+                              {previous_price !== null && (
+                                <p>
+                                  {(previous_price / 100).toLocaleString(
+                                    'pt-BR',
+                                    {
+                                      style: 'currency',
+                                      currency: 'BRL',
+                                    }
+                                  )}
+                                </p>
+                              )}
+                            </styled.ContainerPrice>
+                          </styled.DivInfo>
+                        </styled.ContainerInfo>
+                      </styled.Details>
+                    </styled.SneakersWrapper>
+                  )
+                }
+              )}
             </styled.SneakersContainer>
           </styled.FiltersAndSneakers>
           <styled.ContainerLoad>
