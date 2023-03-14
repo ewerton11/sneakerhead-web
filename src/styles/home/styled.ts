@@ -84,7 +84,7 @@ export const ButtonIcon = styled.button`
 `
 
 export const FilterButton = styled.button`
-  margin: 0px 10px;
+  margin-right: 15px;
   background-color: white;
   display: flex;
   justify-content: space-between;
@@ -110,16 +110,97 @@ export const FilterButtonIcon = styled.div`
   }
 `
 
-export const ContainerSneakersColumns = styled.div`
+export const ContainerSneakersColumns = styled.div<{ columns: string }>`
   width: auto;
   height: 100%;
   display: flex;
   justify-content: space-between;
   margin-left: 10px;
+
+  > div:first-child {
+    & div {
+      border: solid 1px
+        ${({ columns }) =>
+          columns === 'two' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+    }
+
+    &:hover {
+      position: relative;
+      cursor: pointer;
+    }
+
+    &:hover::after {
+      content: 'Duas colunas';
+      position: absolute;
+      top: -15px;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      padding: 2px;
+      // border-radius: 5px;
+      font-size: 12px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+  }
+
+  > div:nth-child(2) {
+    & div {
+      border: solid 1px
+        ${({ columns }) =>
+          columns === 'three' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+    }
+
+    &:hover {
+      position: relative;
+      cursor: pointer;
+    }
+
+    &:hover::after {
+      content: 'Três colunas';
+      position: absolute;
+      top: -15px;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      padding: 2px;
+      // border-radius: 5px;
+      font-size: 12px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+  }
+
+  > div:nth-child(3) {
+    & div {
+      border: solid 1px
+        ${({ columns }) =>
+          columns === 'four' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+    }
+
+    &:hover {
+      position: relative;
+      cursor: pointer;
+    }
+
+    &:hover::after {
+      content: 'Quatro colunas';
+      position: absolute;
+      top: -15px;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: #fff;
+      padding: 2px;
+      // border-radius: 5px;
+      font-size: 12px;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+  }
 `
 
 export const SneakersColumns = styled.div`
-  margin-right: 20px;
+  margin-right: 15px;
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
@@ -128,7 +209,6 @@ export const SneakersColumns = styled.div`
     width: 20px;
     height: 20px;
     margin-right: 1px;
-    border: solid 1px rgba(0, 0, 0, 0.2);
     border-radius: 3px;
     cursor: pointer;
   }
@@ -143,7 +223,7 @@ export const FilterProvided = styled.ul`
     border-radius: 5px;
     margin-right: 5px;
     padding: 7px 2px;
-    color: rgba(0, 0, 0, 0.8);
+    color: rgba(0, 0, 0, 0.5);
     font-size: 0.8rem;
   }
 `
@@ -270,18 +350,17 @@ export const SneakersContainer = styled.main<{ columns: string }>`
   display: grid;
   grid-template-columns: ${({ columns }) =>
     columns === 'two'
-      ? 'repeat(2, minmax(300px, 1fr))'
+      ? 'repeat(2, 1fr)'
       : columns === 'three'
-      ? 'repeat(3, minmax(300px, 1fr))'
+      ? 'repeat(3, 1fr)'
       : columns === 'four'
-      ? 'repeat(4, minmax(300px, 1fr))'
+      ? 'repeat(4, 1fr)'
       : 'repeat(auto-fill, minmax(300px, 1fr))'};
   gap: 30px;
 `
 
 export const SneakersWrapper = styled.div`
-  width: 100%;
-  height: 400px;
+  height: fit-content;
 `
 
 export const Details = styled.a`
