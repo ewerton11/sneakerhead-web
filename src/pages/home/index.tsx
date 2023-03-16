@@ -12,6 +12,7 @@ interface Sneakers {
   name: string
   price: number
   previous_price: number
+  price_history: number
   discount: number
   store: string
   image: string
@@ -31,6 +32,12 @@ export function Feed() {
   const [orderBrand, setOrderBrand] = useState(false)
   const [orderDiscount, setOrderDiscount] = useState(false)
   const [columns, setColumns] = useState('three')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedSneaker, setSelectedSneker] = useState<number>(1)
+  const [resultsSneaker, setResultsSneaker] = useState<Sneakers[]>([])
+  const [resultsneakersEqual, setResultsneakersEqual] = useState<Sneakers[]>([])
+
+  console.log(resultsneakersEqual, 'resultado do tenis')
 
   useEffect(() => {
     async function fetchData() {
@@ -42,10 +49,35 @@ export function Feed() {
 
       const responseAll = await api.get(`sneakers?limit=10000`)
       setResultsAll(responseAll.data)
+
+      const responseSneaker = await api.get(
+        `/sneakers/infoSneaker?id=${selectedSneaker}`
+      )
+      setResultsSneaker(responseSneaker.data)
     }
 
     fetchData()
-  }, [searchValue, sortByBrand, sortByDiscounts, sortByPrice, limit])
+  }, [
+    searchValue,
+    sortByBrand,
+    sortByDiscounts,
+    sortByPrice,
+    limit,
+    selectedSneaker,
+  ])
+
+  useEffect(() => {
+    async function fetchData() {
+      if (resultsSneaker.results && resultsSneaker.results.length > 0) {
+        const responseSnkEqual = await api.get(
+          `/sneakers/sneakersEqual?name=${resultsSneaker.results[0].name}`
+        )
+        setResultsneakersEqual(responseSnkEqual.data)
+      }
+    }
+
+    fetchData()
+  }, [resultsSneaker])
 
   const getItems = () => {
     if (results.length < limit) {
@@ -63,6 +95,18 @@ export function Feed() {
       const searchValue = inputSearch?.value || ''
       setSearchValue(searchValue)
     }
+  }
+
+  const [offset, setOffset] = useState(0)
+  const [slideWidth, setSlideWidth] = useState(0)
+  const containerWidth = 600
+
+  const slidePrev = () => {
+    setOffset((prevOffset) => prevOffset + slideWidth)
+  }
+
+  const slideNext = () => {
+    setOffset((prevOffset) => prevOffset - slideWidth)
   }
 
   return (
@@ -290,7 +334,6 @@ export function Feed() {
               {results.map(
                 ({
                   id,
-                  details,
                   discount,
                   store,
                   image,
@@ -300,7 +343,12 @@ export function Feed() {
                 }: Sneakers) => {
                   return (
                     <styled.SneakersWrapper key={id}>
-                      <styled.Details href={details}>
+                      <styled.Details
+                        onClick={() => {
+                          setModalOpen(!modalOpen)
+                          setSelectedSneker(id)
+                        }}
+                      >
                         <styled.ImageCard>
                           {discount && (
                             <styled.Discount>
@@ -354,6 +402,94 @@ export function Feed() {
                     </styled.SneakersWrapper>
                   )
                 }
+              )}
+              {modalOpen && (
+                <styled.Modal onClick={() => setModalOpen(false)}>
+                  <styled.ModalContent>
+                    {resultsSneaker.results.map(
+                      ({
+                        id,
+                        details,
+                        discount,
+                        store,
+                        image,
+                        name,
+                        price,
+                        previous_price,
+                        price_history,
+                      }: Sneakers) => {
+                        return (
+                          <styled.ModalDetails href={details} key={id}>
+                            <styled.ModalInfo>
+                              <styled.ModelImage>
+                                {store === 'adidas' ? (
+                                  <Image
+                                    src={image}
+                                    width={360}
+                                    height={348}
+                                    alt={''}
+                                    style={{ transform: 'scaleX(-1)' }}
+                                  />
+                                ) : (
+                                  <Image
+                                    src={image}
+                                    width={360}
+                                    height={348}
+                                    alt={''}
+                                  />
+                                )}
+                              </styled.ModelImage>
+                              <styled.InfoSneaker>
+                                <styled.ContainerModalName>
+                                  <styled.ModalName>{name}</styled.ModalName>
+                                </styled.ContainerModalName>
+                                <styled.ModalPrice>
+                                  <p>
+                                    {(price / 100).toLocaleString('pt-BR', {
+                                      style: 'currency',
+                                      currency: 'BRL',
+                                    })}
+                                  </p>
+                                  {previous_price !== null && (
+                                    <p>
+                                      {(previous_price / 100).toLocaleString(
+                                        'pt-BR',
+                                        {
+                                          style: 'currency',
+                                          currency: 'BRL',
+                                        }
+                                      )}
+                                    </p>
+                                  )}
+                                </styled.ModalPrice>
+                                <styled.ModalDiscount>
+                                  <p>{discount}% de desconto</p>
+                                </styled.ModalDiscount>
+                                <p>{price_history}</p>
+                              </styled.InfoSneaker>
+                            </styled.ModalInfo>
+                            <styled.ModalPreviws>
+                              <styled.ModalCarrossel>
+                                {resultsneakersEqual.map((sneakers) => {
+                                  return (
+                                    <styled.ContainerImage key={sneakers.id}>
+                                      <Image
+                                        src={sneakers.image}
+                                        width={360}
+                                        height={348}
+                                        alt={''}
+                                      />
+                                    </styled.ContainerImage>
+                                  )
+                                })}
+                              </styled.ModalCarrossel>
+                            </styled.ModalPreviws>
+                          </styled.ModalDetails>
+                        )
+                      }
+                    )}
+                  </styled.ModalContent>
+                </styled.Modal>
               )}
             </styled.SneakersContainer>
           </styled.FiltersAndSneakers>

@@ -363,7 +363,7 @@ export const SneakersWrapper = styled.div`
   height: fit-content;
 `
 
-export const Details = styled.a`
+export const Details = styled.div`
   width: 100%;
   height: 100%;
   position: relative;
@@ -441,6 +441,127 @@ export const ContainerPrice = styled.div`
     color: rgba(0, 0, 0, 0.7);
     text-decoration: line-through;
     padding-left: 10px;
+  }
+`
+
+export const Modal = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+`
+
+export const ModalContent = styled.div`
+  background-color: white;
+  width: 80%;
+  max-width: 60vw;
+  max-height: 80vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+`
+
+export const ModalDetails = styled.a`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+`
+
+export const ModalInfo = styled.div`
+  width: 100%;
+  max-height: 50%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`
+
+export const ModelImage = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+
+  & img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`
+
+export const InfoSneaker = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+export const ContainerModalName = styled.div`
+  height: 25%;
+  padding-top: 20px;
+  display: flex;
+  align-items: flex-end;
+`
+
+export const ModalName = styled.h1`
+  font-size: 1.5em;
+  letter-spacing: 1px;
+`
+
+export const ModalPrice = styled.div`
+  height: 10%;
+  display: flex;
+  align-items: center;
+
+  > p {
+    font-weight: bold;
+    color: red;
+  }
+
+  > p:nth-child(2) {
+    margin-left: 10px;
+    color: rgba(0, 0, 0, 0.7);
+    text-decoration: line-through;
+  }
+`
+
+export const ModalDiscount = styled.div`
+  & p {
+    color: red;
+  }
+`
+
+export const ModalPreviws = styled.div`
+  width: 100%;
+  height: 200px;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+`
+
+export const ModalCarrossel = styled.div`
+  width: 80%;
+  height: 100%;
+  max-width: 800px;
+  display: flex;
+  overflow-x: scroll;
+  gap: 10px;
+  /* overflow-x: auto; */
+  overflow-y: hidden;
+`
+
+export const ContainerImage = styled.div`
+  min-width: 200px;
+  height: auto;
+  margin-right: 10px;
+
+  & img {
+    width: 100%;
+    height: 100%;
   }
 `
 
