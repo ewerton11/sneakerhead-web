@@ -7,6 +7,19 @@ import Header from '@/components/header'
 import { api } from '@/lib/axios/axios'
 import * as styled from '@/styles/home/styled'
 
+import React from 'react'
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js'
+import { Line } from 'react-chartjs-2'
+
 interface Sneakers {
   id: number
   name: string
@@ -20,8 +33,9 @@ interface Sneakers {
 }
 
 export function Feed() {
-  const [results, setResults] = useState<Sneakers[]>([])
-  const [resultsAll, setResultsAll] = useState<Sneakers[]>([])
+  const [searchResults, setSearchResults] = useState<Sneakers[]>([])
+  const [allResults, setAllResults] = useState<Sneakers[]>([])
+  const [selectedSneakerInfo, setSelectedSneakerInfo] = useState<Sneakers[]>([])
   const [searchValue, setSearchValue] = useState<string>('')
   const [sortByBrand, setSortByBrand] = useState<string>('')
   const [sortByDiscounts, setSortByDiscounts] = useState<string>('')
@@ -34,26 +48,28 @@ export function Feed() {
   const [columns, setColumns] = useState('three')
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedSneaker, setSelectedSneker] = useState<number>(1)
-  const [resultsSneaker, setResultsSneaker] = useState<Sneakers[]>([])
   const [resultsneakersEqual, setResultsneakersEqual] = useState<Sneakers[]>([])
 
-  console.log(resultsneakersEqual, 'resultado do tenis')
-
   useEffect(() => {
-    async function fetchData() {
-      const response = await api.get(
-        `/sneakers?search=${searchValue}&sortByBrand=${sortByBrand}` +
-          `&sortByDiscounts=${sortByDiscounts}&sortByPrice=${sortByPrice}&limit=${limit}`
-      )
-      setResults(response.data)
+    const fetchData = async () => {
+      try {
+        const [searchResults, allResults, selectedSneakerInfo] =
+          await Promise.all([
+            api.get(
+              `/sneakers?search=${searchValue}&sortByBrand=${sortByBrand}` +
+                `&sortByDiscounts=${sortByDiscounts}&sortByPrice=${sortByPrice}` +
+                `&limit=${limit}`
+            ),
+            api.get(`/sneakers?limit=10000`),
+            api.get(`/sneakers/infoSneaker?id=${selectedSneaker}`),
+          ])
 
-      const responseAll = await api.get(`sneakers?limit=10000`)
-      setResultsAll(responseAll.data)
-
-      const responseSneaker = await api.get(
-        `/sneakers/infoSneaker?id=${selectedSneaker}`
-      )
-      setResultsSneaker(responseSneaker.data)
+        setSearchResults(searchResults.data)
+        setAllResults(allResults.data)
+        setSelectedSneakerInfo(selectedSneakerInfo.data)
+      } catch (error) {
+        console.error(error)
+      }
     }
 
     fetchData()
@@ -68,19 +84,27 @@ export function Feed() {
 
   useEffect(() => {
     async function fetchData() {
-      if (resultsSneaker.results && resultsSneaker.results.length > 0) {
-        const responseSnkEqual = await api.get(
-          `/sneakers/sneakersEqual?name=${resultsSneaker.results[0].name}`
-        )
-        setResultsneakersEqual(responseSnkEqual.data)
+      if (
+        selectedSneakerInfo.results &&
+        selectedSneakerInfo.results.length > 0
+      ) {
+        try {
+          const responseSnkEqual = await api.get(
+            `/sneakers/sneakersEqual?name=${selectedSneakerInfo.results[0].name}`
+          )
+
+          setResultsneakersEqual(responseSnkEqual.data)
+        } catch (error) {
+          console.error(error)
+        }
       }
     }
 
     fetchData()
-  }, [resultsSneaker])
+  }, [selectedSneakerInfo])
 
   const getItems = () => {
-    if (results.length < limit) {
+    if (searchResults.length < limit) {
       return
     }
     setLimit((prevState) => prevState + 40)
@@ -97,16 +121,88 @@ export function Feed() {
     }
   }
 
-  const [offset, setOffset] = useState(0)
-  const [slideWidth, setSlideWidth] = useState(0)
-  const containerWidth = 600
+  // const [offset, setOffset] = useState(0)
+  // const [slideWidth, setSlideWidth] = useState(0)
+  // const containerWidth = 600
 
-  const slidePrev = () => {
-    setOffset((prevOffset) => prevOffset + slideWidth)
+  // const slidePrev = () => {
+  //   setOffset((prevOffset) => prevOffset + slideWidth)
+  // }
+
+  // const slideNext = () => {
+  //   setOffset((prevOffset) => prevOffset - slideWidth)
+  // }
+
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  )
+
+  const options = {
+    responsive: true,
+    tension: 0.3,
+    animation: false,
+
+    scales: {
+      x: {
+        grid: {
+          display: false,
+          // drawBorder: false,
+        },
+      },
+      y: {
+        ticks: {
+          display: true,
+        },
+        grid: {
+          display: true,
+          drawTicks: false,
+          // drawBorder: false,
+        },
+      },
+    },
+
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: 'Ultimos preços',
+      },
+    },
   }
 
-  const slideNext = () => {
-    setOffset((prevOffset) => prevOffset - slideWidth)
+  const labels = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+  ]
+
+  // const data = resultsSneaker.results.map((sneakers) => {
+  //   return sneakers.price_history
+  // })
+
+  const data = {
+    labels: labels,
+    datasets: [
+      {
+        label: '',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        borderColor: 'rgb(42, 74, 255)',
+        backgroundColor: 'rgb(42, 74, 255)',
+        borderWidth: 2,
+      },
+    ],
   }
 
   return (
@@ -118,7 +214,7 @@ export function Feed() {
             <styled.ResultsCounterWrapper>
               <styled.ResultsCounter>
                 <p>
-                  <span>[{resultsAll.length}]</span> resultados
+                  <span>[{allResults.length}]</span> resultados
                 </p>
               </styled.ResultsCounter>
             </styled.ResultsCounterWrapper>
@@ -331,7 +427,7 @@ export function Feed() {
               </styled.DesktopFilters>
             )}
             <styled.SneakersContainer columns={columns}>
-              {results.map(
+              {searchResults.map(
                 ({
                   id,
                   discount,
@@ -406,7 +502,7 @@ export function Feed() {
               {modalOpen && (
                 <styled.Modal onClick={() => setModalOpen(false)}>
                   <styled.ModalContent>
-                    {resultsSneaker.results.map(
+                    {selectedSneakerInfo.results.map(
                       ({
                         id,
                         details,
@@ -426,7 +522,7 @@ export function Feed() {
                                   <Image
                                     src={image}
                                     width={360}
-                                    height={348}
+                                    height={360}
                                     alt={''}
                                     style={{ transform: 'scaleX(-1)' }}
                                   />
@@ -434,7 +530,7 @@ export function Feed() {
                                   <Image
                                     src={image}
                                     width={360}
-                                    height={348}
+                                    height={360}
                                     alt={''}
                                   />
                                 )}
@@ -462,13 +558,28 @@ export function Feed() {
                                     </p>
                                   )}
                                 </styled.ModalPrice>
-                                <styled.ModalDiscount>
-                                  <p>{discount}% de desconto</p>
-                                </styled.ModalDiscount>
-                                <p>{price_history}</p>
+                                {discount && (
+                                  <styled.ModalDiscount>
+                                    <p>{discount}% de desconto</p>
+                                  </styled.ModalDiscount>
+                                )}
+                                <styled.HistoryPrice>
+                                  <styled.DivHistory>
+                                    {/* {price_history} */}
+                                    <Line options={options} data={data} />
+                                  </styled.DivHistory>
+                                </styled.HistoryPrice>
                               </styled.InfoSneaker>
                             </styled.ModalInfo>
                             <styled.ModalPreviws>
+                              <div>
+                                <Image
+                                  src="/images/arrow.svg"
+                                  alt="arrow"
+                                  width={10}
+                                  height={10}
+                                />
+                              </div>
                               <styled.ModalCarrossel>
                                 {resultsneakersEqual.map((sneakers) => {
                                   return (
@@ -483,6 +594,14 @@ export function Feed() {
                                   )
                                 })}
                               </styled.ModalCarrossel>
+                              <div>
+                                <Image
+                                  src="/images/arrow.svg"
+                                  alt="arrow"
+                                  width={10}
+                                  height={10}
+                                />
+                              </div>
                             </styled.ModalPreviws>
                           </styled.ModalDetails>
                         )

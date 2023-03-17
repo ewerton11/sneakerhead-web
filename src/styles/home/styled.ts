@@ -533,12 +533,24 @@ export const ModalDiscount = styled.div`
   }
 `
 
+export const HistoryPrice = styled.div`
+  width: 100%;
+  height: 65%;
+  display: flex;
+  align-items: center;
+`
+
+export const DivHistory = styled.div`
+  width: 100%;
+  height: 70%;
+`
+
 export const ModalPreviws = styled.div`
   width: 100%;
   height: 200px;
-  margin-top: 50px;
+  margin-top: 10px;
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   overflow: hidden;
 `
@@ -552,6 +564,10 @@ export const ModalCarrossel = styled.div`
   gap: 10px;
   /* overflow-x: auto; */
   overflow-y: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `
 
 export const ContainerImage = styled.div`
