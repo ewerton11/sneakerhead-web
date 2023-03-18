@@ -110,7 +110,7 @@ export const FilterButtonIcon = styled.div`
   }
 `
 
-export const ContainerSneakersColumns = styled.div<{ columns: string }>`
+export const ContainerSneakersColumns = styled.div<{ gridColumns: string }>`
   width: auto;
   height: 100%;
   display: flex;
@@ -120,8 +120,8 @@ export const ContainerSneakersColumns = styled.div<{ columns: string }>`
   > div:first-child {
     & div {
       border: solid 1px
-        ${({ columns }) =>
-          columns === 'two' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+        ${({ gridColumns }) =>
+          gridColumns === 'two' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
     }
 
     &:hover {
@@ -147,8 +147,10 @@ export const ContainerSneakersColumns = styled.div<{ columns: string }>`
   > div:nth-child(2) {
     & div {
       border: solid 1px
-        ${({ columns }) =>
-          columns === 'three' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+        ${({ gridColumns }) =>
+          gridColumns === 'three'
+            ? 'rgba(0, 0, 0, 0.5)'
+            : 'rgba(0, 0, 0, 0.2)'};
     }
 
     &:hover {
@@ -174,8 +176,8 @@ export const ContainerSneakersColumns = styled.div<{ columns: string }>`
   > div:nth-child(3) {
     & div {
       border: solid 1px
-        ${({ columns }) =>
-          columns === 'four' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
+        ${({ gridColumns }) =>
+          gridColumns === 'four' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.2)'};
     }
 
     &:hover {
@@ -228,10 +230,9 @@ export const FilterProvided = styled.ul`
   }
 `
 
-export const FiltersAndSneakers = styled.div<{ showOptions: boolean }>`
+export const FiltersAndSneakers = styled.div<{ isShown: boolean }>`
   display: grid;
-  grid-template-columns: ${({ showOptions }) =>
-    showOptions ? '20vw 1fr' : '1fr'};
+  grid-template-columns: ${({ isShown }) => (isShown ? '20vw 1fr' : '1fr')};
   grid-template-rows: 1fr;
   gap: 10px;
 `
@@ -342,18 +343,18 @@ export const TextLi = styled.div`
   letter-spacing: 1px;
 `
 
-export const SneakersContainer = styled.main<{ columns: string }>`
+export const SneakersContainer = styled.main<{ gridColumns: string }>`
   width: 100%;
   height: auto;
   min-height: 100vh;
   margin-top: 15px;
   display: grid;
-  grid-template-columns: ${({ columns }) =>
-    columns === 'two'
+  grid-template-columns: ${({ gridColumns }) =>
+    gridColumns === 'two'
       ? 'repeat(2, 1fr)'
-      : columns === 'three'
+      : gridColumns === 'three'
       ? 'repeat(3, 1fr)'
-      : columns === 'four'
+      : gridColumns === 'four'
       ? 'repeat(4, 1fr)'
       : 'repeat(auto-fill, minmax(300px, 1fr))'};
   gap: 30px;
@@ -459,16 +460,17 @@ export const Modal = styled.div`
 
 export const ModalContent = styled.div`
   background-color: white;
-  width: 80%;
-  max-width: 60vw;
-  max-height: 80vh;
+  width: 100%;
+  height: 100%;
+  max-width: 70%;
+  max-height: 80%;
   overflow-x: hidden;
   overflow-y: auto;
 `
 
 export const ModalDetails = styled.a`
   width: 100%;
-  height: 100%;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -476,7 +478,7 @@ export const ModalDetails = styled.a`
 
 export const ModalInfo = styled.div`
   width: 100%;
-  max-height: 50%;
+  height: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
 `
@@ -484,11 +486,13 @@ export const ModalInfo = styled.div`
 export const ModelImage = styled.div`
   width: 100%;
   height: 100%;
-  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   & img {
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 90%;
     object-fit: cover;
   }
 `
@@ -496,17 +500,18 @@ export const ModelImage = styled.div`
 export const InfoSneaker = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
 `
 
 export const ContainerModalName = styled.div`
-  height: 25%;
-  padding-top: 20px;
+  height: auto;
+  padding-top: 0.5em;
   display: flex;
   align-items: flex-end;
 `
 
 export const ModalName = styled.h1`
-  font-size: 1.5em;
+  font-size: 2vw;
   letter-spacing: 1px;
 `
 
@@ -516,6 +521,7 @@ export const ModalPrice = styled.div`
   align-items: center;
 
   > p {
+    font-size: 1.5vw;
     font-weight: bold;
     color: red;
   }
@@ -523,12 +529,14 @@ export const ModalPrice = styled.div`
   > p:nth-child(2) {
     margin-left: 10px;
     color: rgba(0, 0, 0, 0.7);
+    font-size: 2vw;
     text-decoration: line-through;
   }
 `
 
 export const ModalDiscount = styled.div`
   & p {
+    font-size: 2vw;
     color: red;
   }
 `
@@ -537,18 +545,21 @@ export const HistoryPrice = styled.div`
   width: 100%;
   height: 65%;
   display: flex;
+  justify-content: center;
   align-items: center;
 `
 
 export const DivHistory = styled.div`
-  width: 100%;
-  height: 70%;
+  width: 80%;
+  height: 80%;
+  /* border: solid 1px rgba(0, 0, 0, 0.2);
+  border-radius: 10px; */
 `
 
 export const ModalPreviws = styled.div`
   width: 100%;
-  height: 200px;
-  margin-top: 10px;
+  height: auto;
+  margin-top: 7em;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -557,8 +568,7 @@ export const ModalPreviws = styled.div`
 
 export const ModalCarrossel = styled.div`
   width: 80%;
-  height: 100%;
-  max-width: 800px;
+  height: auto;
   display: flex;
   overflow-x: scroll;
   gap: 10px;
@@ -571,7 +581,7 @@ export const ModalCarrossel = styled.div`
 `
 
 export const ContainerImage = styled.div`
-  min-width: 200px;
+  min-width: 30%;
   height: auto;
   margin-right: 10px;
 

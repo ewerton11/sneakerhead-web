@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useCallback, useEffect, useState } from 'react'
 
 import Footer from '@/components/footer'
 import Header from '@/components/header'
@@ -36,19 +36,23 @@ export function Feed() {
   const [searchResults, setSearchResults] = useState<Sneakers[]>([])
   const [allResults, setAllResults] = useState<Sneakers[]>([])
   const [selectedSneakerInfo, setSelectedSneakerInfo] = useState<Sneakers[]>([])
-  const [searchValue, setSearchValue] = useState<string>('')
-  const [sortByBrand, setSortByBrand] = useState<string>('')
-  const [sortByDiscounts, setSortByDiscounts] = useState<string>('')
-  const [sortByPrice, setSortByPrice] = useState<string>('')
-  const [limit, setLimit] = useState(40)
-  const [showOptions, setShowOptions] = useState(false)
-  const [orderPrice, setOrderPrice] = useState(false)
-  const [orderBrand, setOrderBrand] = useState(false)
-  const [orderDiscount, setOrderDiscount] = useState(false)
-  const [columns, setColumns] = useState('three')
-  const [modalOpen, setModalOpen] = useState(false)
-  const [selectedSneaker, setSelectedSneker] = useState<number>(1)
-  const [resultsneakersEqual, setResultsneakersEqual] = useState<Sneakers[]>([])
+  const [searchParams, setSearchParams] = useState({
+    searchQuery: '',
+    brandSort: '',
+    discountSort: '',
+    priceSort: '',
+    limit: 40,
+  })
+  const [showOptions, setShowOptions] = useState({
+    isShown: false,
+    isPriceOrdered: false,
+    isBrandOrdered: false,
+    isDiscountOrdered: false,
+    isModalOpen: false,
+  })
+  const [gridColumns, setGridColumns] = useState('three')
+  const [selectedSneakerId, setSelectedSneakerId] = useState<number>(1)
+  const [equalSneakers, setEqualSneakers] = useState<Sneakers[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,12 +60,12 @@ export function Feed() {
         const [searchResults, allResults, selectedSneakerInfo] =
           await Promise.all([
             api.get(
-              `/sneakers?search=${searchValue}&sortByBrand=${sortByBrand}` +
-                `&sortByDiscounts=${sortByDiscounts}&sortByPrice=${sortByPrice}` +
-                `&limit=${limit}`
+              `/sneakers?searchQuery=${searchParams.searchQuery}&brandSort=${searchParams.brandSort}` +
+                `&discountSort=${searchParams.discountSort}&priceSort=${searchParams.priceSort}` +
+                `&limit=${searchParams.limit}`
             ),
             api.get(`/sneakers?limit=10000`),
-            api.get(`/sneakers/infoSneaker?id=${selectedSneaker}`),
+            api.get(`/sneakers/infoSneaker?id=${selectedSneakerId}`),
           ])
 
         setSearchResults(searchResults.data)
@@ -73,41 +77,34 @@ export function Feed() {
     }
 
     fetchData()
-  }, [
-    searchValue,
-    sortByBrand,
-    sortByDiscounts,
-    sortByPrice,
-    limit,
-    selectedSneaker,
-  ])
+  }, [searchParams, selectedSneakerId])
 
-  useEffect(() => {
-    async function fetchData() {
-      if (
-        selectedSneakerInfo.results &&
-        selectedSneakerInfo.results.length > 0
-      ) {
-        try {
-          const responseSnkEqual = await api.get(
-            `/sneakers/sneakersEqual?name=${selectedSneakerInfo.results[0].name}`
-          )
+  const fetchEqualSneakers = useCallback(async () => {
+    if (selectedSneakerInfo && selectedSneakerInfo.length > 0) {
+      try {
+        const responseSnkEqual = await api.get(
+          `/sneakers/sneakersEqual?name=${selectedSneakerInfo[0].name}`
+        )
 
-          setResultsneakersEqual(responseSnkEqual.data)
-        } catch (error) {
-          console.error(error)
-        }
+        setEqualSneakers(responseSnkEqual.data)
+      } catch (error) {
+        console.error(error)
       }
     }
-
-    fetchData()
   }, [selectedSneakerInfo])
 
+  useEffect(() => {
+    fetchEqualSneakers()
+  }, [fetchEqualSneakers])
+
   const getItems = () => {
-    if (searchResults.length < limit) {
+    if (searchResults.length < searchParams.limit) {
       return
     }
-    setLimit((prevState) => prevState + 40)
+    setSearchParams((prevSearchParams) => ({
+      ...prevSearchParams,
+      limit: prevSearchParams.limit + 40,
+    }))
   }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -116,8 +113,11 @@ export function Feed() {
 
     if (elements) {
       const inputSearch = elements.namedItem('inputSearch') as HTMLInputElement
-      const searchValue = inputSearch?.value || ''
-      setSearchValue(searchValue)
+      const searchQuery = inputSearch?.value || ''
+      setSearchParams((prevSearchParams) => ({
+        ...prevSearchParams,
+        searchQuery: searchQuery,
+      }))
     }
   }
 
@@ -146,24 +146,29 @@ export function Feed() {
   const options = {
     responsive: true,
     tension: 0.3,
-    animation: false,
+    animation: { duration: 0 },
 
+    interaction: {
+      intersect: false,
+    },
     scales: {
       x: {
         grid: {
           display: false,
           // drawBorder: false,
         },
+        display: false,
       },
       y: {
         ticks: {
           display: true,
         },
         grid: {
-          display: true,
-          drawTicks: false,
+          display: false,
+          // drawTicks: false,
           // drawBorder: false,
         },
+        display: false,
       },
     },
 
@@ -188,6 +193,16 @@ export function Feed() {
     'July',
   ]
 
+  // selectedSneakerInfo.map((updatedSneaker) => {
+  //   return updatedSneaker.updated_at
+  // })
+
+  const historyPrice = [999.0, 1200.0, 1300.0, 999.0, 850.0, 700.0, 900.0]
+
+  // selectedSneakerInfo.map((updatedSneaker) => {
+  //   return updatedSneaker.price_history
+  // })
+
   // const data = resultsSneaker.results.map((sneakers) => {
   //   return sneakers.price_history
   // })
@@ -197,10 +212,11 @@ export function Feed() {
     datasets: [
       {
         label: '',
-        data: [65, 59, 80, 81, 56, 55, 40],
+        data: historyPrice,
         borderColor: 'rgb(42, 74, 255)',
         backgroundColor: 'rgb(42, 74, 255)',
         borderWidth: 2,
+        radius: 0,
       },
     ],
   }
@@ -235,7 +251,14 @@ export function Feed() {
                 </styled.ButtonIcon>
               </styled.SearchBarForm>
             </styled.SearchBarContainer>
-            <styled.FilterButton onClick={() => setShowOptions(!showOptions)}>
+            <styled.FilterButton
+              onClick={() =>
+                setShowOptions((prevOptions) => ({
+                  ...prevOptions,
+                  isShown: !prevOptions.isShown,
+                }))
+              }
+            >
               <styled.FilterButtonText>Filtrar</styled.FilterButtonText>
               <styled.FilterButtonIcon>
                 <Image
@@ -246,17 +269,17 @@ export function Feed() {
                 />
               </styled.FilterButtonIcon>
             </styled.FilterButton>
-            <styled.ContainerSneakersColumns columns={columns}>
-              <styled.SneakersColumns onClick={() => setColumns('two')}>
+            <styled.ContainerSneakersColumns gridColumns={gridColumns}>
+              <styled.SneakersColumns onClick={() => setGridColumns('two')}>
                 <div></div>
                 <div></div>
               </styled.SneakersColumns>
-              <styled.SneakersColumns onClick={() => setColumns('three')}>
+              <styled.SneakersColumns onClick={() => setGridColumns('three')}>
                 <div></div>
                 <div></div>
                 <div></div>
               </styled.SneakersColumns>
-              <styled.SneakersColumns onClick={() => setColumns('four')}>
+              <styled.SneakersColumns onClick={() => setGridColumns('four')}>
                 <div></div>
                 <div></div>
                 <div></div>
@@ -264,24 +287,33 @@ export function Feed() {
               </styled.SneakersColumns>
             </styled.ContainerSneakersColumns>
             <styled.FilterProvided>
-              {sortByPrice === 'DescPrice' && <li>maiores preços</li>}
-              {sortByPrice === 'AscPrice' && <li>menores preços</li>}
-              {sortByBrand === 'adidas' && <li>marca adidas</li>}
-              {sortByBrand === 'nike' && <li>marca nike</li>}
-              {sortByDiscounts === 'DescDiscount' && <li>com disconto</li>}
+              {searchParams.priceSort === 'DescPrice' && (
+                <li>maiores preços</li>
+              )}
+              {searchParams.priceSort === 'AscPrice' && <li>menores preços</li>}
+              {searchParams.brandSort === 'adidas' && <li>marca adidas</li>}
+              {searchParams.brandSort === 'nike' && <li>marca nike</li>}
+              {searchParams.discountSort === 'DescDiscount' && (
+                <li>com disconto</li>
+              )}
             </styled.FilterProvided>
           </styled.FilterWrapper>
-          <styled.FiltersAndSneakers showOptions={showOptions}>
-            {showOptions && (
+          <styled.FiltersAndSneakers isShown={showOptions.isShown}>
+            {showOptions.isShown && (
               <styled.DesktopFilters>
                 <styled.ListFilter>
                   <styled.OrderButton
-                    onClick={() => setOrderPrice(!orderPrice)}
+                    onClick={() =>
+                      setShowOptions((prevOptions) => ({
+                        ...prevOptions,
+                        isPriceOrdered: !prevOptions.isPriceOrdered,
+                      }))
+                    }
                   >
                     <styled.ButtonText>
                       <h2>Preços</h2>
                     </styled.ButtonText>
-                    <styled.ArrowIcon orderButton={orderPrice}>
+                    <styled.ArrowIcon orderButton={showOptions.isPriceOrdered}>
                       <Image
                         src="/images/arrow.svg"
                         alt="arrow"
@@ -290,11 +322,14 @@ export function Feed() {
                       />
                     </styled.ArrowIcon>
                   </styled.OrderButton>
-                  <styled.ListOptions orderButton={orderPrice}>
+                  <styled.ListOptions orderButton={showOptions.isPriceOrdered}>
                     <styled.ClearSelection>
                       <styled.ClearText
                         onClick={() => {
-                          setSortByPrice('')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            priceSort: '',
+                          }))
                         }}
                       >
                         Limpar
@@ -303,25 +338,31 @@ export function Feed() {
                     <styled.UlList>
                       <li
                         role="checkbox"
-                        aria-checked={sortByPrice === 'DescPrice'}
+                        aria-checked={searchParams.priceSort === 'DescPrice'}
                         onClick={() => {
-                          setSortByPrice('DescPrice')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            priceSort: 'DescPrice',
+                          }))
                         }}
                       >
                         <styled.Square>
-                          {sortByPrice === 'DescPrice' && '✔️'}
+                          {searchParams.priceSort === 'DescPrice' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Maior preço</styled.TextLi>
                       </li>
                       <li
                         role="checkbox"
-                        aria-checked={sortByPrice === 'AscPrice'}
+                        aria-checked={searchParams.priceSort === 'AscPrice'}
                         onClick={() => {
-                          setSortByPrice('AscPrice')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            priceSort: 'AscPrice',
+                          }))
                         }}
                       >
                         <styled.Square>
-                          {sortByPrice === 'AscPrice' && '✔️'}
+                          {searchParams.priceSort === 'AscPrice' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Menor preço</styled.TextLi>
                       </li>
@@ -330,12 +371,17 @@ export function Feed() {
                 </styled.ListFilter>
                 <styled.ListFilter>
                   <styled.OrderButton
-                    onClick={() => setOrderBrand(!orderBrand)}
+                    onClick={() =>
+                      setShowOptions((prevOptions) => ({
+                        ...prevOptions,
+                        isBrandOrdered: !prevOptions.isBrandOrdered,
+                      }))
+                    }
                   >
                     <styled.ButtonText>
                       <h2>Marca</h2>
                     </styled.ButtonText>
-                    <styled.ArrowIcon orderButton={orderBrand}>
+                    <styled.ArrowIcon orderButton={showOptions.isBrandOrdered}>
                       <Image
                         src="/images/arrow.svg"
                         alt="arrow"
@@ -344,11 +390,14 @@ export function Feed() {
                       />
                     </styled.ArrowIcon>
                   </styled.OrderButton>
-                  <styled.ListOptions orderButton={orderBrand}>
+                  <styled.ListOptions orderButton={showOptions.isBrandOrdered}>
                     <styled.ClearSelection>
                       <styled.ClearText
                         onClick={() => {
-                          setSortByBrand('')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            brandSort: '',
+                          }))
                         }}
                       >
                         Limpar
@@ -357,25 +406,31 @@ export function Feed() {
                     <styled.UlList>
                       <li
                         role="checkbox"
-                        aria-checked={sortByBrand === 'adidas'}
+                        aria-checked={searchParams.brandSort === 'adidas'}
                         onClick={() => {
-                          setSortByBrand('adidas')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            brandSort: 'adidas',
+                          }))
                         }}
                       >
                         <styled.Square>
-                          {sortByBrand === 'adidas' && '✔️'}
+                          {searchParams.brandSort === 'adidas' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Adidas</styled.TextLi>
                       </li>
                       <li
                         role="checkbox"
-                        aria-checked={sortByBrand === 'nike'}
+                        aria-checked={searchParams.brandSort === 'nike'}
                         onClick={() => {
-                          setSortByBrand('nike')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            brandSort: 'nike',
+                          }))
                         }}
                       >
                         <styled.Square>
-                          {sortByBrand === 'nike' && '✔️'}
+                          {searchParams.brandSort === 'nike' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Nike</styled.TextLi>
                       </li>
@@ -384,12 +439,19 @@ export function Feed() {
                 </styled.ListFilter>
                 <styled.ListFilter>
                   <styled.OrderButton
-                    onClick={() => setOrderDiscount(!orderDiscount)}
+                    onClick={() =>
+                      setShowOptions((prevOptions) => ({
+                        ...prevOptions,
+                        isDiscountOrdered: !prevOptions.isDiscountOrdered,
+                      }))
+                    }
                   >
                     <styled.ButtonText>
                       <h2>Descontos</h2>
                     </styled.ButtonText>
-                    <styled.ArrowIcon orderButton={orderDiscount}>
+                    <styled.ArrowIcon
+                      orderButton={showOptions.isDiscountOrdered}
+                    >
                       <Image
                         src="/images/arrow.svg"
                         alt="arrow"
@@ -398,11 +460,16 @@ export function Feed() {
                       />
                     </styled.ArrowIcon>
                   </styled.OrderButton>
-                  <styled.ListOptions orderButton={orderDiscount}>
+                  <styled.ListOptions
+                    orderButton={showOptions.isDiscountOrdered}
+                  >
                     <styled.ClearSelection>
                       <styled.ClearText
                         onClick={() => {
-                          setSortByDiscounts('')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            discountSort: '',
+                          }))
                         }}
                       >
                         Limpar
@@ -411,13 +478,18 @@ export function Feed() {
                     <styled.UlList>
                       <li
                         role="checkbox"
-                        aria-checked={sortByDiscounts === 'DescDiscount'}
+                        aria-checked={
+                          searchParams.discountSort === 'DescDiscount'
+                        }
                         onClick={() => {
-                          setSortByDiscounts('DescDiscount')
+                          setSearchParams((prevSearchParams) => ({
+                            ...prevSearchParams,
+                            discountSort: 'DescDiscount',
+                          }))
                         }}
                       >
                         <styled.Square>
-                          {sortByDiscounts === 'DescDiscount' && '✔️'}
+                          {searchParams.discountSort === 'DescDiscount' && '✔️'}
                         </styled.Square>
                         <styled.TextLi>Com desconto</styled.TextLi>
                       </li>
@@ -426,7 +498,7 @@ export function Feed() {
                 </styled.ListFilter>
               </styled.DesktopFilters>
             )}
-            <styled.SneakersContainer columns={columns}>
+            <styled.SneakersContainer gridColumns={gridColumns}>
               {searchResults.map(
                 ({
                   id,
@@ -441,8 +513,11 @@ export function Feed() {
                     <styled.SneakersWrapper key={id}>
                       <styled.Details
                         onClick={() => {
-                          setModalOpen(!modalOpen)
-                          setSelectedSneker(id)
+                          setShowOptions((prevOption) => ({
+                            ...prevOption,
+                            isModalOpen: !prevOption.isModalOpen,
+                          }))
+                          setSelectedSneakerId(id)
                         }}
                       >
                         <styled.ImageCard>
@@ -499,10 +574,17 @@ export function Feed() {
                   )
                 }
               )}
-              {modalOpen && (
-                <styled.Modal onClick={() => setModalOpen(false)}>
+              {showOptions.isModalOpen && (
+                <styled.Modal
+                  onClick={() => {
+                    setShowOptions((prevOption) => ({
+                      ...prevOption,
+                      isModalOpen: false,
+                    }))
+                  }}
+                >
                   <styled.ModalContent>
-                    {selectedSneakerInfo.results.map(
+                    {selectedSneakerInfo.map(
                       ({
                         id,
                         details,
@@ -565,8 +647,8 @@ export function Feed() {
                                 )}
                                 <styled.HistoryPrice>
                                   <styled.DivHistory>
-                                    {/* {price_history} */}
-                                    <Line options={options} data={data} />
+                                  {/* {price_history} */}
+                                  <Line options={options} data={data} />
                                   </styled.DivHistory>
                                 </styled.HistoryPrice>
                               </styled.InfoSneaker>
@@ -581,7 +663,7 @@ export function Feed() {
                                 />
                               </div>
                               <styled.ModalCarrossel>
-                                {resultsneakersEqual.map((sneakers) => {
+                                {equalSneakers.map((sneakers) => {
                                   return (
                                     <styled.ContainerImage key={sneakers.id}>
                                       <Image
