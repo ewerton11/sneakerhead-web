@@ -1,5 +1,10 @@
 import styled, { keyframes } from 'styled-components'
 
+interface ModalPreviewsProps {
+  left: number
+  right: number
+}
+
 export const LayoutContainer = styled.div`
   display: grid;
   grid-template-rows: 5vh 1fr auto;
@@ -470,9 +475,7 @@ export const ModalContent = styled.div`
 
 export const ModalDetails = styled.a`
   width: 100%;
-  height: fit-content;
-  display: flex;
-  flex-direction: column;
+  height: auto;
   cursor: pointer;
 `
 
@@ -556,14 +559,45 @@ export const DivHistory = styled.div`
   border-radius: 10px; */
 `
 
-export const ModalPreviws = styled.div`
+export const ModalPreviws = styled.div<{ displayScroll: ModalPreviewsProps }>`
   width: 100%;
   height: auto;
-  margin-top: 7em;
   display: flex;
   justify-content: space-around;
   align-items: center;
   overflow: hidden;
+
+  > div:nth-child(1) {
+    width: 5%;
+    height: 5%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+
+    & img {
+      width: 100%;
+      height: 100%;
+      padding: 30%;
+      background: ${({ displayScroll }) =>
+        displayScroll.left === 0 ? 'yellow' : 'white'};
+    }
+  }
+
+  > div:nth-child(3) {
+    width: 5%;
+    height: 5%;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+
+    & img {
+      width: 100%;
+      height: 100%;
+      padding: 30%;
+      background: ${({ displayScroll }) =>
+        displayScroll.right === 0 ? 'yellow' : 'white'};
+    }
+  }
 `
 
 export const ModalCarrossel = styled.div`
@@ -583,7 +617,6 @@ export const ModalCarrossel = styled.div`
 export const ContainerImage = styled.div`
   min-width: 30%;
   height: auto;
-  margin-right: 10px;
 
   & img {
     width: 100%;

@@ -1,5 +1,12 @@
 import Image from 'next/image'
-import { FormEvent, useCallback, useEffect, useState } from 'react'
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import Footer from '@/components/footer'
 import Header from '@/components/header'
@@ -53,6 +60,11 @@ export function Feed() {
   const [gridColumns, setGridColumns] = useState('three')
   const [selectedSneakerId, setSelectedSneakerId] = useState<number>(1)
   const [equalSneakers, setEqualSneakers] = useState<Sneakers[]>([])
+  const carouselContainerRef = useRef<HTMLDivElement>(null)
+  const [carouselScrollState, setCarouselScrollState] = useState({
+    left: 0,
+    right: 1,
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -121,17 +133,49 @@ export function Feed() {
     }
   }
 
-  // const [offset, setOffset] = useState(0)
-  // const [slideWidth, setSlideWidth] = useState(0)
-  // const containerWidth = 600
+  function handleCarouselLeftArrowClick() {
+    if (!carouselContainerRef.current) return
 
-  // const slidePrev = () => {
-  //   setOffset((prevOffset) => prevOffset + slideWidth)
-  // }
+    const { clientWidth, scrollLeft } = carouselContainerRef.current
 
-  // const slideNext = () => {
-  //   setOffset((prevOffset) => prevOffset - slideWidth)
-  // }
+    setCarouselScrollState({
+      left: scrollLeft,
+      right: 1,
+    })
+
+    const scrollAmount = Math.round(clientWidth * 0.7)
+
+    carouselContainerRef.current.scrollBy({
+      left: -scrollAmount,
+      behavior: 'smooth',
+    })
+  }
+
+  function handleCarouselRightArrowClick() {
+    if (!carouselContainerRef.current) return
+
+    const { scrollLeft, scrollWidth, clientWidth } =
+      carouselContainerRef.current
+
+    if (scrollLeft >= scrollWidth - clientWidth) {
+      setCarouselScrollState({
+        left: scrollLeft,
+        right: 0,
+      })
+    } else {
+      setCarouselScrollState((scroll) => ({
+        ...scroll,
+        left: 1,
+      }))
+    }
+
+    const scrollAmount = Math.round(clientWidth * 0.7)
+
+    carouselContainerRef.current.scrollBy({
+      left: scrollAmount,
+      behavior: 'smooth',
+    })
+  }
 
   ChartJS.register(
     CategoryScale,
@@ -515,7 +559,8 @@ export function Feed() {
                         onClick={() => {
                           setShowOptions((prevOption) => ({
                             ...prevOption,
-                            isModalOpen: !prevOption.isModalOpen,
+                            isModalOpen: true,
+                            // !prevOption.isModalOpen, por no lugar do true
                           }))
                           setSelectedSneakerId(id)
                         }}
@@ -579,7 +624,8 @@ export function Feed() {
                   onClick={() => {
                     setShowOptions((prevOption) => ({
                       ...prevOption,
-                      isModalOpen: false,
+                      isModalOpen: true,
+                      //trocar para false
                     }))
                   }}
                 >
@@ -647,48 +693,50 @@ export function Feed() {
                                 )}
                                 <styled.HistoryPrice>
                                   <styled.DivHistory>
-                                  {/* {price_history} */}
-                                  <Line options={options} data={data} />
+                                    {/* {price_history} */}
+                                    <Line options={options} data={data} />
                                   </styled.DivHistory>
                                 </styled.HistoryPrice>
                               </styled.InfoSneaker>
                             </styled.ModalInfo>
-                            <styled.ModalPreviws>
-                              <div>
-                                <Image
-                                  src="/images/arrow.svg"
-                                  alt="arrow"
-                                  width={10}
-                                  height={10}
-                                />
-                              </div>
-                              <styled.ModalCarrossel>
-                                {equalSneakers.map((sneakers) => {
-                                  return (
-                                    <styled.ContainerImage key={sneakers.id}>
-                                      <Image
-                                        src={sneakers.image}
-                                        width={360}
-                                        height={348}
-                                        alt={''}
-                                      />
-                                    </styled.ContainerImage>
-                                  )
-                                })}
-                              </styled.ModalCarrossel>
-                              <div>
-                                <Image
-                                  src="/images/arrow.svg"
-                                  alt="arrow"
-                                  width={10}
-                                  height={10}
-                                />
-                              </div>
-                            </styled.ModalPreviws>
                           </styled.ModalDetails>
                         )
                       }
                     )}
+                    <styled.ModalPreviws displayScroll={carouselScrollState}>
+                      <div onClick={handleCarouselLeftArrowClick}>
+                        <Image
+                          src="/images/arrow.svg"
+                          alt="arrow"
+                          width={10}
+                          height={10}
+                          style={{ transform: 'rotate(90deg)' }}
+                        />
+                      </div>
+                      <styled.ModalCarrossel ref={carouselContainerRef}>
+                        {equalSneakers.map((sneakers) => {
+                          return (
+                            <styled.ContainerImage key={sneakers.id}>
+                              <Image
+                                src={sneakers.image}
+                                width={360}
+                                height={348}
+                                alt={''}
+                              />
+                            </styled.ContainerImage>
+                          )
+                        })}
+                      </styled.ModalCarrossel>
+                      <div onClick={handleCarouselRightArrowClick}>
+                        <Image
+                          src="/images/arrow.svg"
+                          alt="arrow"
+                          width={10}
+                          height={10}
+                          style={{ transform: 'rotate(270deg)' }}
+                        />
+                      </div>
+                    </styled.ModalPreviws>
                   </styled.ModalContent>
                 </styled.Modal>
               )}
