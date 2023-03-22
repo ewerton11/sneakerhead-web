@@ -532,14 +532,14 @@ export const ModalPrice = styled.div`
   > p:nth-child(2) {
     margin-left: 10px;
     color: rgba(0, 0, 0, 0.7);
-    font-size: 2vw;
+    font-size: 1.5vw;
     text-decoration: line-through;
   }
 `
 
 export const ModalDiscount = styled.div`
   & p {
-    font-size: 2vw;
+    font-size: 1.5vw;
     color: red;
   }
 `
@@ -572,14 +572,14 @@ export const ModalPreviws = styled.div<{ displayScroll: ModalPreviewsProps }>`
     height: 5%;
     display: flex;
     justify-content: center;
+    /* visibility: ${({ displayScroll }) =>
+      displayScroll.left === 0 ? 'hidden' : 'visible'}; */
     cursor: pointer;
 
     & img {
       width: 100%;
       height: 100%;
       padding: 30%;
-      background: ${({ displayScroll }) =>
-        displayScroll.left === 0 ? 'yellow' : 'white'};
     }
   }
 
@@ -588,14 +588,14 @@ export const ModalPreviws = styled.div<{ displayScroll: ModalPreviewsProps }>`
     height: 5%;
     display: flex;
     justify-content: center;
+    /* visibility: ${({ displayScroll }) =>
+      displayScroll.right === 0 ? 'hidden' : 'visible'}; */
     cursor: pointer;
 
     & img {
       width: 100%;
       height: 100%;
       padding: 30%;
-      background: ${({ displayScroll }) =>
-        displayScroll.right === 0 ? 'yellow' : 'white'};
     }
   }
 `
@@ -616,7 +616,9 @@ export const ModalCarrossel = styled.div`
 
 export const ContainerImage = styled.div`
   min-width: 30%;
+  max-width: 30%;
   height: auto;
+  cursor: pointer;
 
   & img {
     width: 100%;

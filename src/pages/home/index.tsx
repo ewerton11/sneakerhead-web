@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import {
   FormEvent,
+  MouseEventHandler,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -39,7 +40,7 @@ interface Sneakers {
   details: string
 }
 
-export function Feed() {
+export default function Home() {
   const [searchResults, setSearchResults] = useState<Sneakers[]>([])
   const [allResults, setAllResults] = useState<Sneakers[]>([])
   const [selectedSneakerInfo, setSelectedSneakerInfo] = useState<Sneakers[]>([])
@@ -61,6 +62,7 @@ export function Feed() {
   const [selectedSneakerId, setSelectedSneakerId] = useState<number>(1)
   const [equalSneakers, setEqualSneakers] = useState<Sneakers[]>([])
   const carouselContainerRef = useRef<HTMLDivElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
   const [carouselScrollState, setCarouselScrollState] = useState({
     left: 0,
     right: 1,
@@ -129,6 +131,15 @@ export function Feed() {
       setSearchParams((prevSearchParams) => ({
         ...prevSearchParams,
         searchQuery: searchQuery,
+      }))
+    }
+  }
+
+  const handleClickOutside: MouseEventHandler<HTMLDivElement> = (e) => {
+    if (e.target === modalRef.current) {
+      setShowOptions((prevOption) => ({
+        ...prevOption,
+        isModalOpen: false,
       }))
     }
   }
@@ -241,7 +252,7 @@ export function Feed() {
   //   return updatedSneaker.updated_at
   // })
 
-  const historyPrice = [999.0, 1200.0, 1300.0, 999.0, 850.0, 700.0, 900.0]
+  const historyPrice = [400, 450, 400, 350, 400, 400, 400]
 
   // selectedSneakerInfo.map((updatedSneaker) => {
   //   return updatedSneaker.price_history
@@ -559,8 +570,7 @@ export function Feed() {
                         onClick={() => {
                           setShowOptions((prevOption) => ({
                             ...prevOption,
-                            isModalOpen: true,
-                            // !prevOption.isModalOpen, por no lugar do true
+                            isModalOpen: !prevOption.isModalOpen,
                           }))
                           setSelectedSneakerId(id)
                         }}
@@ -620,15 +630,7 @@ export function Feed() {
                 }
               )}
               {showOptions.isModalOpen && (
-                <styled.Modal
-                  onClick={() => {
-                    setShowOptions((prevOption) => ({
-                      ...prevOption,
-                      isModalOpen: true,
-                      //trocar para false
-                    }))
-                  }}
-                >
+                <styled.Modal onClick={handleClickOutside} ref={modalRef}>
                   <styled.ModalContent>
                     {selectedSneakerInfo.map(
                       ({
@@ -716,7 +718,10 @@ export function Feed() {
                       <styled.ModalCarrossel ref={carouselContainerRef}>
                         {equalSneakers.map((sneakers) => {
                           return (
-                            <styled.ContainerImage key={sneakers.id}>
+                            <styled.ContainerImage
+                              key={sneakers.id}
+                              onClick={() => setSelectedSneakerId(sneakers.id)}
+                            >
                               <Image
                                 src={sneakers.image}
                                 width={360}
