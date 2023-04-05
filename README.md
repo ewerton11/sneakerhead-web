@@ -1,38 +1,18 @@
+<h1 align="center">Sneakerhead-web</h1>
+<p align="center">
+  <img src="https://github.com/ewerton11/sneakerhead-web/blob/main/docs/screen.gif" alt="sneakerhead-web">
+</p>
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+## Project description
 
-First, run the development server:
+> Our front-end application displays a variety of sneakers with their corresponding prices, discounts, and price history graphs. You can filter your search by name, price, and discount. Each sneaker listing includes multiple images. The price history graph helps you make informed purchasing decisions. It's the perfect place to find your next favorite pair of sneakers.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## How to use
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> Make sure you have Node.js installed on your machine. If not, download and install the latest version from https://nodejs.org/.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+> Open a terminal in the cloned project folder and run the `"npm install"` command to install all the necessary dependencies.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+> Run the command `"npm run dev"` to start the local server.
