@@ -4,7 +4,6 @@ import {
   MouseEventHandler,
   useCallback,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react'
@@ -59,7 +58,7 @@ export default function Home() {
     isModalOpen: false,
   })
   const [gridColumns, setGridColumns] = useState('three')
-  const [selectedSneakerId, setSelectedSneakerId] = useState<number>(1)
+  const [selectedSneakerId, setSelectedSneakerId] = useState<number>(200) //corrigir
   const [equalSneakers, setEqualSneakers] = useState<Sneakers[]>([])
   const carouselContainerRef = useRef<HTMLDivElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
@@ -248,19 +247,7 @@ export default function Home() {
     'July',
   ]
 
-  // selectedSneakerInfo.map((updatedSneaker) => {
-  //   return updatedSneaker.updated_at
-  // })
-
   const historyPrice = [400, 450, 400, 350, 400, 400, 400]
-
-  // selectedSneakerInfo.map((updatedSneaker) => {
-  //   return updatedSneaker.price_history
-  // })
-
-  // const data = resultsSneaker.results.map((sneakers) => {
-  //   return sneakers.price_history
-  // })
 
   const data = {
     labels: labels,
@@ -695,7 +682,6 @@ export default function Home() {
                                 )}
                                 <styled.HistoryPrice>
                                   <styled.DivHistory>
-                                    {/* {price_history} */}
                                     <Line options={options} data={data} />
                                   </styled.DivHistory>
                                 </styled.HistoryPrice>
